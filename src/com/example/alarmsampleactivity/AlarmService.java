@@ -31,7 +31,8 @@ public class AlarmService {
 		Log.v(TAG, "setAlarm. ID:" + mEventId);
 		Intent intent = new Intent(mContext, AlarmReceiver.class);
         intent.setData(Uri.parse("custom://customizeCalendar/" + mEventId));
-        intent.putExtra("EventID", mEventId);   
+        intent.putExtra("EventID", mEventId);
+        intent.putExtra("data", alarmWay);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, 0, intent, 0 );
           
         AlarmManager am = (AlarmManager ) mContext.getSystemService(Context.ALARM_SERVICE );
@@ -61,9 +62,20 @@ public class AlarmService {
 		DH = new DBHelper(mContext);
 		SQLiteDatabase db = DH.getWritableDatabase();
 	    db.delete("AlarmTable", "_EventID=" + mEventId, null);
+	    DH.close();
 	}
 	
 	public void updateAlarm(long start, int reminderTime, String alarmWay) {
+		Intent intent = new Intent(mContext, AlarmReceiver.class);
+        intent.setData(Uri.parse("custom://customizeCalendar/" + mEventId));
+        intent.putExtra("EventID", mEventId);
+        intent.putExtra("data", alarmWay);
+        PendingIntent pendingIntent = 				//使用FLAG_CANCEL_CURRENT才能更新intent
+        		PendingIntent.getBroadcast(mContext, 0, intent,  PendingIntent.FLAG_CANCEL_CURRENT);
+          
+        AlarmManager am = (AlarmManager ) mContext.getSystemService(Context.ALARM_SERVICE );
+        am.set(AlarmManager .RTC_WAKEUP, start - (reminderTime * 1000 ), pendingIntent);
+        
 		DH = new DBHelper(mContext);
         SQLiteDatabase db = DH.getWritableDatabase();
         ContentValues values = new ContentValues();

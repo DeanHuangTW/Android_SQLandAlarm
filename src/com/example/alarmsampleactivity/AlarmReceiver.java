@@ -19,6 +19,8 @@ public final class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context,Intent intent){
     	Long eventId = intent.getLongExtra("EventID", 0);
+    	String data = intent.getStringExtra("data");
+    	Log.v(TAG, data);
     	
     	String notifyWay = getNotifyWayFromDatabase(context, eventId);    	    	
     	
@@ -32,6 +34,7 @@ public final class AlarmReceiver extends BroadcastReceiver {
     	}
     }
     
+    /* 根據eventID取的Database中的Notify way*/
     private String getNotifyWayFromDatabase(Context context, Long eventId) {
     	DH = new DBHelper(context);
         SQLiteDatabase db = DH.getReadableDatabase();
